@@ -17,7 +17,7 @@ public enum SubscriptionState {
         return this.kor;
     }
 
-    public boolean isChangableTo(SubscriptionState state) {
+    public boolean ensureUpdatable(SubscriptionState state) {
         if (this == state) {
             throw new SubscriptionStateCanNotChangeException("구독 상태 변경이 불가합니다: " + this.toKor() + "->" + state.toKor());
 

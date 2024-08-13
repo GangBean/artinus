@@ -13,7 +13,7 @@ public class SubscriptionStateTest {
     @ParameterizedTest
     @MethodSource("generateChangeWhenPossible")
     void change_when_possible(SubscriptionState from, SubscriptionState to) {
-        Assertions.assertThatNoException().isThrownBy(() -> from.isChangableTo(to));
+        Assertions.assertThatNoException().isThrownBy(() -> from.ensureUpdatable(to));
     }
 
     private static Stream<Arguments> generateChangeWhenPossible() {
@@ -29,7 +29,7 @@ public class SubscriptionStateTest {
     @ParameterizedTest
     @MethodSource("generateChangeThrowsExceptionWithMessageWhenSameState")
     void change_throws_exception_with_message_when_same_state(SubscriptionState from, SubscriptionState to) {
-        Assertions.assertThatThrownBy(() -> from.isChangableTo(to))
+        Assertions.assertThatThrownBy(() -> from.ensureUpdatable(to))
                 .hasMessage("구독 상태 변경이 불가합니다: " + from.toKor() + "->" + to.toKor())
                 .isInstanceOf(SubscriptionStateCanNotChangeException.class);
     }
