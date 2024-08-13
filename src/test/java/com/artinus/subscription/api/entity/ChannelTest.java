@@ -7,6 +7,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.artinus.subscription.api.exception.ChannelCanNotCancleException;
+import com.artinus.subscription.api.exception.ChannelCanNotSubscribeException;
+
 public class ChannelTest {
     @ParameterizedTest
     @MethodSource("generateSubscribeWhenPossible")
@@ -31,7 +34,7 @@ public class ChannelTest {
 
         Assertions.assertThatThrownBy(() -> channel.subscribe())
                 .hasMessage("해당 채널은 구독이 불가합니다: " + channelType.toKor())
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(ChannelCanNotSubscribeException.class);
     }
 
     private static Stream<Arguments> generateSubscribeThrowExceptionAndMessageWhenImpossible() {
@@ -57,16 +60,16 @@ public class ChannelTest {
     }
 
     @ParameterizedTest
-    @MethodSource("generateCanclehrowExceptionAndMessageWhenImpossible")
+    @MethodSource("generateCancleThrowExceptionAndMessageWhenImpossible")
     void cancle_throw_Exception_and_messgage_when_impossible(ChannelType channelType) {
         Channel channel = Channel.builder().channelType(channelType).build();
 
         Assertions.assertThatThrownBy(() -> channel.cancle())
                 .hasMessage("해당 채널은 해지가 불가합니다: " + channelType.toKor())
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(ChannelCanNotCancleException.class);
     }
 
-    private static Stream<Arguments> generateCanclehrowExceptionAndMessageWhenImpossible() {
+    private static Stream<Arguments> generateCancleThrowExceptionAndMessageWhenImpossible() {
         return Stream.of(
             Arguments.of(ChannelType.MOBILE)
         );

@@ -1,5 +1,8 @@
 package com.artinus.subscription.api.entity;
 
+import com.artinus.subscription.api.exception.ChannelCanNotCancleException;
+import com.artinus.subscription.api.exception.ChannelCanNotSubscribeException;
+
 public enum ChannelType {
     WEB("웹") {
 
@@ -17,7 +20,7 @@ public enum ChannelType {
 
         @Override
         public void cancle() {
-            throw new RuntimeException("해당 채널은 해지가 불가합니다: " + this.toKor());
+            throw new ChannelCanNotCancleException("해당 채널은 해지가 불가합니다: " + this.toKor());
         }
 
         @Override
@@ -34,7 +37,7 @@ public enum ChannelType {
 
         @Override
         public void subscribe() {
-            throw new RuntimeException("해당 채널은 구독이 불가합니다: " + this.toKor());           
+            throw new ChannelCanNotSubscribeException("해당 채널은 구독이 불가합니다: " + this.toKor());           
         }
         
     };
