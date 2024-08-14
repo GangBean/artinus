@@ -23,6 +23,9 @@ public class CellPhoneNumber {
 
     public static CellPhoneNumber from(String format) {
         String[] numbers = format.split("-");
+        if (numbers.length != 3) {
+            throw new RuntimeException("유효하지 않은 형태의 휴대전화 입력입니다(-로 구분 필요): " + format);
+        }
         return CellPhoneNumber.builder()
                 .front(numbers[0])
                 .middle(numbers[1])
