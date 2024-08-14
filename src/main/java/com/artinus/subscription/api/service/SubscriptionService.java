@@ -15,6 +15,8 @@ import com.artinus.subscription.api.entity.SubscriptionRequest;
 import com.artinus.subscription.api.entity.SubscriptionState;
 import com.artinus.subscription.api.repository.MemberRepository;
 import com.artinus.subscription.api.repository.SubscriptionRequestRepository;
+import com.artinus.subscription.api.response.RequestListResponse;
+import com.artinus.subscription.api.response.RequestResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,7 +39,7 @@ public class SubscriptionService {
                 .date(dateTime.toLocalDate())
                 .time(dateTime.toLocalTime())
                 .build();
-        
+
         this.memberRepository.save(member);
         this.subscriptionRequestRepository.save(request);
     }
@@ -59,8 +61,15 @@ public class SubscriptionService {
         this.subscriptionRequestRepository.save(request);
     }
 
-    public List<Object> getRequestsByPhoneNumber(CellPhoneNumber phoneNumber) {
-        return new ArrayList<>();
+    public RequestListResponse getRequestsByPhoneNumber(CellPhoneNumber phoneNumber) {
+        Member member = this.memberRepository.findByCellPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new RuntimeException("해당 핸드폰 번호를 갖는 고객 정보가 존재하지 않습니다: " + phoneNumber.toString()));
+        List<SubscriptionRequest> requests = subscriptionRequestRepository.findAllByMemberId(member.getId());
+        return RequestListResponse.builder()
+                .requests(requests.stream()
+                        .map(RequestResponse::from)
+                        .toList())
+                .build();
     }
 
     public List<Object> getRequestsByDateAndChannel(LocalDate date, Channel channel) {

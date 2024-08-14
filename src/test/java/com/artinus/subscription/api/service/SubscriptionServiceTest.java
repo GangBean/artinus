@@ -1,6 +1,8 @@
 package com.artinus.subscription.api.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
@@ -21,13 +23,16 @@ import com.artinus.subscription.api.entity.SubscriptionRequest;
 import com.artinus.subscription.api.entity.SubscriptionState;
 import com.artinus.subscription.api.repository.MemberRepository;
 import com.artinus.subscription.api.repository.SubscriptionRequestRepository;
+import com.artinus.subscription.api.response.RequestResponse;
 
 @DataJpaTest
 @ActiveProfiles("test")
 public class SubscriptionServiceTest {
 
-    @Autowired private MemberRepository memberRepository;
-    @Autowired private SubscriptionRequestRepository requestRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private SubscriptionRequestRepository requestRepository;
     private SubscriptionService service;
 
     @BeforeEach
@@ -65,14 +70,14 @@ public class SubscriptionServiceTest {
 
     private static Stream<Arguments> generateSubscribeUpdateMemberStateAndMakeRequestWhenChannelIsNotApp() {
         return Stream.of(
-            Arguments.of(ChannelType.WEB),
-            Arguments.of(ChannelType.MOBILE)
-        );
+                Arguments.of(ChannelType.WEB),
+                Arguments.of(ChannelType.MOBILE));
     }
 
     @ParameterizedTest
     @MethodSource("generateCancleUpdateMemberStateToNoneAndMakeRequestWhenChannelIsNotMobile")
-    void cancle_update_member_state_to_none_and_make_request_when_channel_is_not_mobile(SubscriptionState state, ChannelType channelType) {
+    void cancle_update_member_state_to_none_and_make_request_when_channel_is_not_mobile(SubscriptionState state,
+            ChannelType channelType) {
         // given
         Member member = memberRepository.save(Member.builder()
                 .cellPhoneNumber(CellPhoneNumber.builder().front("010").middle("1234").rear("5678").build())
@@ -99,10 +104,56 @@ public class SubscriptionServiceTest {
 
     private static Stream<Arguments> generateCancleUpdateMemberStateToNoneAndMakeRequestWhenChannelIsNotMobile() {
         return Stream.of(
-            Arguments.of(SubscriptionState.NORMAL, ChannelType.WEB),
-            Arguments.of(SubscriptionState.NORMAL, ChannelType.APP),
-            Arguments.of(SubscriptionState.PREMIUM, ChannelType.WEB),
-            Arguments.of(SubscriptionState.PREMIUM, ChannelType.APP)
-        );
+                Arguments.of(SubscriptionState.NORMAL, ChannelType.WEB),
+                Arguments.of(SubscriptionState.NORMAL, ChannelType.APP),
+                Arguments.of(SubscriptionState.PREMIUM, ChannelType.WEB),
+                Arguments.of(SubscriptionState.PREMIUM, ChannelType.APP));
+    }
+
+    @Test
+    void get_requests_by_phone_number_return_list_of_phone_number_owners_entire_subscription_histories() {
+        // given
+        Member member = Member.builder()
+                .cellPhoneNumber(CellPhoneNumber.builder()
+                .front("010").middle("1234").rear("4567")
+                .build())
+                .subscriptionState(SubscriptionState.NONE)
+                .build();
+        memberRepository.save(member);
+
+        Channel channel = Channel.builder().channelType(ChannelType.WEB).build();
+
+        List<LocalDateTime> dateTimes = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+        service.subscribe(member.getCellPhoneNumber(), channel, SubscriptionState.NORMAL, now);
+        dateTimes.add(now);
+
+        now = now.plusDays(1);
+        service.cancle(member.getCellPhoneNumber(), channel, now);
+        dateTimes.add(now);
+        
+        now = now.plusDays(1);
+        service.subscribe(member.getCellPhoneNumber(), channel, SubscriptionState.PREMIUM, now);
+        dateTimes.add(now);
+
+        // when
+        List<RequestResponse> requests = service.getRequestsByPhoneNumber(member.getCellPhoneNumber()).getRequests();
+
+        Assertions.assertThat(requests.size()).isEqualTo(3);
+        Assertions.assertThat(requests.get(0).getMemberId()).isEqualTo(member.getId());
+        Assertions.assertThat(requests.get(0).getSubscriptionState()).isEqualTo(SubscriptionState.NORMAL);
+        Assertions.assertThat(requests.get(0).getChannel()).isEqualTo(channel);
+        Assertions.assertThat(requests.get(0).getDate()).isEqualTo(dateTimes.get(0).toLocalDate());
+        Assertions.assertThat(requests.get(0).getTime()).isEqualTo(dateTimes.get(0).toLocalTime());
+        Assertions.assertThat(requests.get(1).getMemberId()).isEqualTo(member.getId());
+        Assertions.assertThat(requests.get(1).getSubscriptionState()).isEqualTo(SubscriptionState.NONE);
+        Assertions.assertThat(requests.get(1).getChannel()).isEqualTo(channel);
+        Assertions.assertThat(requests.get(1).getDate()).isEqualTo(dateTimes.get(1).toLocalDate());
+        Assertions.assertThat(requests.get(1).getTime()).isEqualTo(dateTimes.get(1).toLocalTime());
+        Assertions.assertThat(requests.get(2).getMemberId()).isEqualTo(member.getId());
+        Assertions.assertThat(requests.get(2).getSubscriptionState()).isEqualTo(SubscriptionState.PREMIUM);
+        Assertions.assertThat(requests.get(2).getChannel()).isEqualTo(channel);
+        Assertions.assertThat(requests.get(2).getDate()).isEqualTo(dateTimes.get(2).toLocalDate());
+        Assertions.assertThat(requests.get(2).getTime()).isEqualTo(dateTimes.get(2).toLocalTime());
     }
 }
