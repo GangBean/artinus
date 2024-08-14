@@ -25,5 +25,8 @@ public class SubscriptionHistory {
     private Long channelId;
 
     @Enumerated(value = EnumType.STRING)
-    private SubscriptionState subscriptionState;
+    private SubscriptionState beforeState;
+
+    @Enumerated(value = EnumType.STRING)
+    private SubscriptionState afterState;
 }

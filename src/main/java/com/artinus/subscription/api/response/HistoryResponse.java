@@ -16,18 +16,20 @@ public class HistoryResponse {
     private final Long id;
     private final Long memberId;
     private final Long channelId;
-    private final SubscriptionState subscriptionState;
+    private final SubscriptionState beforeState;
+    private final SubscriptionState afterState;
     private final LocalDate date;
     private final LocalTime time;
 
-    public static HistoryResponse from(SubscriptionHistory request) {
+    public static HistoryResponse from(SubscriptionHistory history) {
         return HistoryResponse.builder()
-                .id(request.getId())
-                .memberId(request.getMemberId())
-                .channelId(request.getChannelId())
-                .subscriptionState(request.getSubscriptionState())
-                .date(request.getDate())
-                .time(request.getTime())
+                .id(history.getId())
+                .memberId(history.getMemberId())
+                .channelId(history.getChannelId())
+                .beforeState(history.getBeforeState())
+                .afterState(history.getAfterState())
+                .date(history.getDate())
+                .time(history.getTime())
                 .build();
     }
 }

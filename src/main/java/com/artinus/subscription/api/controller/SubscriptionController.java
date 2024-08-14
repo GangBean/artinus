@@ -18,7 +18,7 @@ import com.artinus.subscription.api.exception.SubscriptionControllerException;
 import com.artinus.subscription.api.request.CancleRequest;
 import com.artinus.subscription.api.request.SubscriptionRequest;
 import com.artinus.subscription.api.response.CancleResponse;
-import com.artinus.subscription.api.response.RequestListResponse;
+import com.artinus.subscription.api.response.HistoryListResponse;
 import com.artinus.subscription.api.response.SubscribeResponse;
 import com.artinus.subscription.api.service.SubscriptionService;
 
@@ -58,14 +58,14 @@ public class SubscriptionController {
     }
 
     @GetMapping("/histories")
-    public ResponseEntity<RequestListResponse> getRequestHistories(
+    public ResponseEntity<HistoryListResponse> getRequestHistories(
             @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
             @RequestParam(value = "date", required = false) LocalDate date,
             @RequestParam(value = "channel", required = false) Long channelId) {
         if (phoneNumber == null && (date == null || channelId == null)) {
             throw new SubscriptionControllerException("휴대전화번호 혹은 날짜&채널 은 필수 입력입니다.");
         }
-        RequestListResponse response;
+        HistoryListResponse response;
         if (phoneNumber != null) {
             response = subscriptionService.getRequestsByPhoneNumber(CellPhoneNumber.from(phoneNumber));
         } else {

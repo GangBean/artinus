@@ -8,6 +8,6 @@ import lombok.Getter;
 
 @Builder @Getter
 @EqualsAndHashCode
-public class RequestListResponse {
+public class HistoryListResponse {
     private final List<HistoryResponse> histories;
 }

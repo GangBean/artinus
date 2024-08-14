@@ -17,7 +17,7 @@ import com.artinus.subscription.api.repository.ChannelRepository;
 import com.artinus.subscription.api.repository.MemberRepository;
 import com.artinus.subscription.api.repository.SubscriptionRequestRepository;
 import com.artinus.subscription.api.response.CancleResponse;
-import com.artinus.subscription.api.response.RequestListResponse;
+import com.artinus.subscription.api.response.HistoryListResponse;
 import com.artinus.subscription.api.response.HistoryResponse;
 import com.artinus.subscription.api.response.SubscribeResponse;
 
@@ -31,18 +31,23 @@ public class SubscriptionService {
         private final ChannelRepository channelRepository;
 
         @Transactional
-        public SubscribeResponse subscribe(CellPhoneNumber phoneNumber, Long channelId, SubscriptionState state,
+        public SubscribeResponse subscribe(
+                        CellPhoneNumber phoneNumber,
+                        Long channelId,
+                        SubscriptionState state,
                         LocalDateTime dateTime) {
                 Channel channel = findChannelByIdOrThrowsException(channelId);
                 channel.validateSubscription();
 
                 Member member = findMemberByCellPhoneNumberOrThrowsException(phoneNumber);
+                SubscriptionState beforeState = member.getSubscriptionState();
                 member.subscribe(state);
 
                 SubscriptionHistory history = SubscriptionHistory.builder()
                                 .memberId(member.getId())
                                 .channelId(channel.getId())
-                                .subscriptionState(state)
+                                .beforeState(beforeState)
+                                .afterState(member.getSubscriptionState())
                                 .date(dateTime.toLocalDate())
                                 .time(dateTime.toLocalTime())
                                 .build();
@@ -56,18 +61,23 @@ public class SubscriptionService {
         }
 
         @Transactional
-        public CancleResponse cancle(CellPhoneNumber phoneNumber, Long channelId, SubscriptionState state,
+        public CancleResponse cancle(
+                        CellPhoneNumber phoneNumber,
+                        Long channelId,
+                        SubscriptionState state,
                         LocalDateTime dateTime) {
                 Channel channel = findChannelByIdOrThrowsException(channelId);
                 channel.validateCancle();
 
                 Member member = findMemberByCellPhoneNumberOrThrowsException(phoneNumber);
+                SubscriptionState beforeState = member.getSubscriptionState();
                 member.cancle(state);
 
                 SubscriptionHistory history = SubscriptionHistory.builder()
                                 .memberId(member.getId())
                                 .channelId(channel.getId())
-                                .subscriptionState(member.getSubscriptionState())
+                                .beforeState(beforeState)
+                                .afterState(member.getSubscriptionState())
                                 .date(dateTime.toLocalDate())
                                 .time(dateTime.toLocalTime())
                                 .build();
@@ -80,22 +90,23 @@ public class SubscriptionService {
                                 .build();
         }
 
-        public RequestListResponse getRequestsByPhoneNumber(CellPhoneNumber phoneNumber) {
+        public HistoryListResponse getRequestsByPhoneNumber(CellPhoneNumber phoneNumber) {
                 Member member = findMemberByCellPhoneNumberOrThrowsException(phoneNumber);
 
                 List<SubscriptionHistory> histories = subscriptionRequestRepository
                                 .findAllByMemberIdOrderByDateDescTimeDesc(member.getId());
-                return RequestListResponse.builder()
+                return HistoryListResponse.builder()
                                 .histories(histories.stream()
                                                 .map(HistoryResponse::from)
                                                 .toList())
                                 .build();
         }
 
-        public RequestListResponse getRequestsByDateAndChannel(LocalDate date, Long channelId) {
+        public HistoryListResponse getRequestsByDateAndChannel(LocalDate date, Long channelId) {
                 List<SubscriptionHistory> histories = subscriptionRequestRepository
                                 .findAllByDateAndChannelIdOrderByDateDescTimeDescMemberIdAsc(date, channelId);
-                return RequestListResponse.builder()
+
+                return HistoryListResponse.builder()
                                 .histories(histories.stream()
                                                 .map(HistoryResponse::from)
                                                 .toList())

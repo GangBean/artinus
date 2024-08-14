@@ -49,10 +49,11 @@ public class SubscriptionServiceTest {
         void subscribe_update_member_state_and_make_request_when_channel_has_subscribe_auth(String name,
                         ChannelAuthSet auths) {
                 // given
+                SubscriptionState beforeState = SubscriptionState.NONE;
                 Member member = memberRepository.save(Member.builder()
                                 .cellPhoneNumber(CellPhoneNumber.builder().front("010").middle("1234").rear("5678")
                                                 .build())
-                                .subscriptionState(SubscriptionState.NONE)
+                                .subscriptionState(beforeState)
                                 .build());
                 Channel channel = channelRepository.save(Channel.builder()
                                 .name(name)
@@ -66,14 +67,16 @@ public class SubscriptionServiceTest {
                 service.subscribe(member.getCellPhoneNumber(), channel.getId(), state, now);
 
                 Member foundMember = memberRepository.findById(member.getId()).orElseThrow();
-                SubscriptionHistory request = requestRepository.findAll().get(0);
+                SubscriptionHistory history = requestRepository.findAll().get(0);
 
                 // then
                 Assertions.assertThat(foundMember.getSubscriptionState()).isEqualTo(state);
-                Assertions.assertThat(request.getMemberId()).isEqualTo(foundMember.getId());
-                Assertions.assertThat(request.getChannelId()).isEqualTo(channel.getId());
-                Assertions.assertThat(request.getDate()).isEqualTo(now.toLocalDate());
-                Assertions.assertThat(request.getTime()).isEqualTo(now.toLocalTime());
+                Assertions.assertThat(history.getMemberId()).isEqualTo(foundMember.getId());
+                Assertions.assertThat(history.getChannelId()).isEqualTo(channel.getId());
+                Assertions.assertThat(history.getDate()).isEqualTo(now.toLocalDate());
+                Assertions.assertThat(history.getTime()).isEqualTo(now.toLocalTime());
+                Assertions.assertThat(history.getBeforeState()).isEqualTo(beforeState);
+                Assertions.assertThat(history.getAfterState()).isEqualTo(member.getSubscriptionState());
         }
 
         private static Stream<Arguments> generateSubscribeUpdateMemberStateAndMakeRequestWhenChannelHasSubscribeAuth() {
@@ -104,14 +107,16 @@ public class SubscriptionServiceTest {
                 service.cancle(member.getCellPhoneNumber(), channel.getId(), SubscriptionState.NONE, now);
 
                 Member foundMember = memberRepository.findById(member.getId()).orElseThrow();
-                SubscriptionHistory request = requestRepository.findAll().get(0);
+                SubscriptionHistory history = requestRepository.findAll().get(0);
 
                 // then
                 Assertions.assertThat(foundMember.getSubscriptionState()).isEqualTo(SubscriptionState.NONE);
-                Assertions.assertThat(request.getMemberId()).isEqualTo(foundMember.getId());
-                Assertions.assertThat(request.getChannelId()).isEqualTo(channel.getId());
-                Assertions.assertThat(request.getDate()).isEqualTo(now.toLocalDate());
-                Assertions.assertThat(request.getTime()).isEqualTo(now.toLocalTime());
+                Assertions.assertThat(history.getMemberId()).isEqualTo(foundMember.getId());
+                Assertions.assertThat(history.getChannelId()).isEqualTo(channel.getId());
+                Assertions.assertThat(history.getDate()).isEqualTo(now.toLocalDate());
+                Assertions.assertThat(history.getTime()).isEqualTo(now.toLocalTime());
+                Assertions.assertThat(history.getBeforeState()).isEqualTo(state);
+                Assertions.assertThat(history.getAfterState()).isEqualTo(member.getSubscriptionState());
         }
 
         private static Stream<Arguments> generateCancleUpdateMemberStateToNoneAndMakeRequestWhenChannelHasCancleAuth() {
@@ -151,25 +156,28 @@ public class SubscriptionServiceTest {
                 dateTimes.add(now);
 
                 // when
-                List<HistoryResponse> requests = service.getRequestsByPhoneNumber(member.getCellPhoneNumber())
+                List<HistoryResponse> histories = service.getRequestsByPhoneNumber(member.getCellPhoneNumber())
                                 .getHistories();
 
-                Assertions.assertThat(requests.size()).isEqualTo(3);
-                Assertions.assertThat(requests.get(0).getMemberId()).isEqualTo(member.getId());
-                Assertions.assertThat(requests.get(0).getSubscriptionState()).isEqualTo(SubscriptionState.PREMIUM);
-                Assertions.assertThat(requests.get(0).getChannelId()).isEqualTo(channel.getId());
-                Assertions.assertThat(requests.get(0).getDate()).isEqualTo(dateTimes.get(2).toLocalDate());
-                Assertions.assertThat(requests.get(0).getTime()).isEqualTo(dateTimes.get(2).toLocalTime());
-                Assertions.assertThat(requests.get(1).getMemberId()).isEqualTo(member.getId());
-                Assertions.assertThat(requests.get(1).getSubscriptionState()).isEqualTo(SubscriptionState.NONE);
-                Assertions.assertThat(requests.get(1).getChannelId()).isEqualTo(channel.getId());
-                Assertions.assertThat(requests.get(1).getDate()).isEqualTo(dateTimes.get(1).toLocalDate());
-                Assertions.assertThat(requests.get(1).getTime()).isEqualTo(dateTimes.get(1).toLocalTime());
-                Assertions.assertThat(requests.get(2).getMemberId()).isEqualTo(member.getId());
-                Assertions.assertThat(requests.get(2).getSubscriptionState()).isEqualTo(SubscriptionState.NORMAL);
-                Assertions.assertThat(requests.get(2).getChannelId()).isEqualTo(channel.getId());
-                Assertions.assertThat(requests.get(2).getDate()).isEqualTo(dateTimes.get(0).toLocalDate());
-                Assertions.assertThat(requests.get(2).getTime()).isEqualTo(dateTimes.get(0).toLocalTime());
+                Assertions.assertThat(histories.size()).isEqualTo(3);
+                Assertions.assertThat(histories.get(0).getMemberId()).isEqualTo(member.getId());
+                Assertions.assertThat(histories.get(0).getBeforeState()).isEqualTo(SubscriptionState.NONE);
+                Assertions.assertThat(histories.get(0).getAfterState()).isEqualTo(SubscriptionState.PREMIUM);
+                Assertions.assertThat(histories.get(0).getChannelId()).isEqualTo(channel.getId());
+                Assertions.assertThat(histories.get(0).getDate()).isEqualTo(dateTimes.get(2).toLocalDate());
+                Assertions.assertThat(histories.get(0).getTime()).isEqualTo(dateTimes.get(2).toLocalTime());
+                Assertions.assertThat(histories.get(1).getMemberId()).isEqualTo(member.getId());
+                Assertions.assertThat(histories.get(1).getBeforeState()).isEqualTo(SubscriptionState.NORMAL);
+                Assertions.assertThat(histories.get(1).getAfterState()).isEqualTo(SubscriptionState.NONE);
+                Assertions.assertThat(histories.get(1).getChannelId()).isEqualTo(channel.getId());
+                Assertions.assertThat(histories.get(1).getDate()).isEqualTo(dateTimes.get(1).toLocalDate());
+                Assertions.assertThat(histories.get(1).getTime()).isEqualTo(dateTimes.get(1).toLocalTime());
+                Assertions.assertThat(histories.get(2).getMemberId()).isEqualTo(member.getId());
+                Assertions.assertThat(histories.get(2).getBeforeState()).isEqualTo(SubscriptionState.NONE);
+                Assertions.assertThat(histories.get(2).getAfterState()).isEqualTo(SubscriptionState.NORMAL);
+                Assertions.assertThat(histories.get(2).getChannelId()).isEqualTo(channel.getId());
+                Assertions.assertThat(histories.get(2).getDate()).isEqualTo(dateTimes.get(0).toLocalDate());
+                Assertions.assertThat(histories.get(2).getTime()).isEqualTo(dateTimes.get(0).toLocalTime());
         }
 
         @Test
@@ -228,19 +236,22 @@ public class SubscriptionServiceTest {
 
                 Assertions.assertThat(requests.size()).isEqualTo(3);
                 Assertions.assertThat(requests.get(0).getMemberId()).isEqualTo(member.getId());
-                Assertions.assertThat(requests.get(0).getSubscriptionState()).isEqualTo(SubscriptionState.NONE);
+                Assertions.assertThat(requests.get(0).getBeforeState()).isEqualTo(SubscriptionState.NORMAL);
+                Assertions.assertThat(requests.get(0).getAfterState()).isEqualTo(SubscriptionState.NONE);
                 Assertions.assertThat(requests.get(0).getChannelId()).isEqualTo(channel.getId());
                 Assertions.assertThat(requests.get(0).getDate()).isEqualTo(dateTimes.get(0).toLocalDate());
                 Assertions.assertThat(requests.get(0).getTime()).isEqualTo(dateTimes.get(0).toLocalTime().plusHours(2));
 
                 Assertions.assertThat(requests.get(1).getMemberId()).isEqualTo(member.getId());
-                Assertions.assertThat(requests.get(1).getSubscriptionState()).isEqualTo(SubscriptionState.NORMAL);
+                Assertions.assertThat(requests.get(1).getBeforeState()).isEqualTo(SubscriptionState.NONE);
+                Assertions.assertThat(requests.get(1).getAfterState()).isEqualTo(SubscriptionState.NORMAL);
                 Assertions.assertThat(requests.get(1).getChannelId()).isEqualTo(channel.getId());
                 Assertions.assertThat(requests.get(1).getDate()).isEqualTo(dateTimes.get(0).toLocalDate());
                 Assertions.assertThat(requests.get(1).getTime()).isEqualTo(dateTimes.get(0).toLocalTime());
 
                 Assertions.assertThat(requests.get(2).getMemberId()).isEqualTo(member2.getId());
-                Assertions.assertThat(requests.get(2).getSubscriptionState()).isEqualTo(SubscriptionState.NORMAL);
+                Assertions.assertThat(requests.get(2).getBeforeState()).isEqualTo(SubscriptionState.NONE);
+                Assertions.assertThat(requests.get(2).getAfterState()).isEqualTo(SubscriptionState.NORMAL);
                 Assertions.assertThat(requests.get(2).getChannelId()).isEqualTo(channel.getId());
                 Assertions.assertThat(requests.get(2).getDate()).isEqualTo(dateTimes.get(0).toLocalDate());
                 Assertions.assertThat(requests.get(2).getTime()).isEqualTo(dateTimes.get(0).toLocalTime());
