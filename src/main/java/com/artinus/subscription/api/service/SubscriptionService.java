@@ -37,11 +37,26 @@ public class SubscriptionService {
                 .date(dateTime.toLocalDate())
                 .time(dateTime.toLocalTime())
                 .build();
+        
+        this.memberRepository.save(member);
         this.subscriptionRequestRepository.save(request);
     }
 
+    @Transactional
     public void cancle(CellPhoneNumber phoneNumber, Channel channel, LocalDateTime dateTime) {
+        Member member = this.memberRepository.findByCellPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new RuntimeException("해당 핸드폰 번호를 갖는 고객 정보가 존재하지 않습니다: " + phoneNumber.toString()));
+        member.cancle();
+        SubscriptionRequest request = SubscriptionRequest.builder()
+                .memberId(member.getId())
+                .channel(channel)
+                .subscriptionState(member.getSubscriptionState())
+                .date(dateTime.toLocalDate())
+                .time(dateTime.toLocalTime())
+                .build();
 
+        this.memberRepository.save(member);
+        this.subscriptionRequestRepository.save(request);
     }
 
     public List<Object> getRequestsByPhoneNumber(CellPhoneNumber phoneNumber) {
