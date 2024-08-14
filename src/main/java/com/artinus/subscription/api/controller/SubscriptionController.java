@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.artinus.subscription.api.entity.CellPhoneNumber;
+import com.artinus.subscription.api.exception.SubscriptionControllerException;
 import com.artinus.subscription.api.request.CancleRequest;
 import com.artinus.subscription.api.request.SubscriptionRequest;
 import com.artinus.subscription.api.response.CancleResponse;
@@ -62,7 +63,7 @@ public class SubscriptionController {
             @RequestParam(value = "date", required = false) LocalDate date,
             @RequestParam(value = "channel", required = false) Long channelId) {
         if (phoneNumber == null && (date == null || channelId == null)) {
-            throw new RuntimeException("휴대전화번호 혹은 날짜&채널 은 필수 입력입니다.");
+            throw new SubscriptionControllerException("휴대전화번호 혹은 날짜&채널 은 필수 입력입니다.");
         }
         RequestListResponse response;
         if (phoneNumber != null) {

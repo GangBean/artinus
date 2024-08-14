@@ -9,5 +9,5 @@ import lombok.Getter;
 @Builder @Getter
 @EqualsAndHashCode
 public class RequestListResponse {
-    private final List<RequestResponse> requests;
+    private final List<HistoryResponse> histories;
 }

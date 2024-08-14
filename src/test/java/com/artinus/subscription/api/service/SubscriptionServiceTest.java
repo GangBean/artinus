@@ -25,7 +25,7 @@ import com.artinus.subscription.api.entity.SubscriptionState;
 import com.artinus.subscription.api.repository.ChannelRepository;
 import com.artinus.subscription.api.repository.MemberRepository;
 import com.artinus.subscription.api.repository.SubscriptionRequestRepository;
-import com.artinus.subscription.api.response.RequestResponse;
+import com.artinus.subscription.api.response.HistoryResponse;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -151,8 +151,8 @@ public class SubscriptionServiceTest {
                 dateTimes.add(now);
 
                 // when
-                List<RequestResponse> requests = service.getRequestsByPhoneNumber(member.getCellPhoneNumber())
-                                .getRequests();
+                List<HistoryResponse> requests = service.getRequestsByPhoneNumber(member.getCellPhoneNumber())
+                                .getHistories();
 
                 Assertions.assertThat(requests.size()).isEqualTo(3);
                 Assertions.assertThat(requests.get(0).getMemberId()).isEqualTo(member.getId());
@@ -222,9 +222,9 @@ public class SubscriptionServiceTest {
                 dateTimes.add(now);
 
                 // when
-                List<RequestResponse> requests = service
+                List<HistoryResponse> requests = service
                                 .getRequestsByDateAndChannel(dateTimes.get(0).toLocalDate(), channel.getId())
-                                .getRequests();
+                                .getHistories();
 
                 Assertions.assertThat(requests.size()).isEqualTo(3);
                 Assertions.assertThat(requests.get(0).getMemberId()).isEqualTo(member.getId());
