@@ -22,7 +22,7 @@ public class Member {
     private Long id;
     
     @Convert(converter = CellPhoneNumberConverter.class)
-    private CellPhoneNumber CellPhoneNumber;
+    private CellPhoneNumber cellPhoneNumber;
     
     @Enumerated(value = EnumType.STRING)
     private SubscriptionState subscriptionState;
@@ -50,5 +50,4 @@ public class Member {
         subscriptionState.ensureUpdatable(SubscriptionState.NONE);
         this.subscriptionState = SubscriptionState.NONE;
     }
-
 }
