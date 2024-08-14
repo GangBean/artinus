@@ -23,11 +23,6 @@ public final class CellPhoneNumberConverter implements AttributeConverter<CellPh
 
     @Override
     public CellPhoneNumber convertToEntityAttribute(String dbData) {
-        String[] numbers = dbData.split(DELIMITER);
-        return dbData != null ? CellPhoneNumber.builder()
-                .front(numbers[0])
-                .middle(numbers[1])
-                .rear(numbers[2])
-                .build() : null;
+        return dbData != null ? CellPhoneNumber.from(dbData) : null;
     }
 }
