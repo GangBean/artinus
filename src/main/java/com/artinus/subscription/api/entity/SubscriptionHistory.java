@@ -3,8 +3,6 @@ package com.artinus.subscription.api.entity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import com.artinus.subscription.api.config.ChannelConverter;
-
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,15 +17,17 @@ import lombok.NoArgsConstructor;
 
 @Builder @AllArgsConstructor @Getter
 @Entity @NoArgsConstructor
-public class SubscriptionRequest {
+public class SubscriptionHistory {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDate date;
     private LocalTime time;
     private Long memberId;
-    
-    @Convert(converter = ChannelConverter.class)
-    private Channel channel;
+
+    // @Convert(converter = ChannelConverter.class)
+    // private Channel channel;
+
+    private Long channelId;
 
     @Enumerated(value = EnumType.STRING)
     private SubscriptionState subscriptionState;

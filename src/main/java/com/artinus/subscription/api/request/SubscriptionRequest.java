@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Getter @NoArgsConstructor
 public class SubscriptionRequest {
     private String cellPhoneNumber;
-    private String channel;
+    private Long channelId;
     private SubscriptionState subscriptionState;
 }

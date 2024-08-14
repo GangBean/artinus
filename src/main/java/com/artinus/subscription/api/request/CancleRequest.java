@@ -11,6 +11,6 @@ import lombok.Getter;
 @Getter
 public class CancleRequest {
     private String cellPhoneNumber;
-    private String channel;
+    private Long channelId;
     private SubscriptionState subscriptionState;
 }

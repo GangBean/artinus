@@ -11,7 +11,7 @@ public class ConverterConfig {
     }
 
     @Bean
-    public ChannelConverter channelConverter() {
-        return new ChannelConverter();
+    public ChannelAuthSetConverter channelAuthSetConverter() {
+        return new ChannelAuthSetConverter();
     }
 }

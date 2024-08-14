@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.artinus.subscription.api.entity.CellPhoneNumber;
-import com.artinus.subscription.api.entity.Channel;
-import com.artinus.subscription.api.entity.ChannelType;
 import com.artinus.subscription.api.request.CancleRequest;
 import com.artinus.subscription.api.request.SubscriptionRequest;
 import com.artinus.subscription.api.response.CancleResponse;
@@ -39,7 +37,7 @@ public class SubscriptionController {
 
         SubscribeResponse response = this.subscriptionService.subscribe(
                 CellPhoneNumber.from(request.getCellPhoneNumber()),
-                Channel.builder().channelType(ChannelType.valueOf(request.getChannel())).build(),
+                request.getChannelId(),
                 request.getSubscriptionState(), now);
 
         return ResponseEntity.created(URI.create("/api/histories/" + response.getHistoryId()))
@@ -51,7 +49,7 @@ public class SubscriptionController {
             @RequestBody CancleRequest request) {
         LocalDateTime now = LocalDateTime.now();
         CancleResponse response = this.subscriptionService.cancle(CellPhoneNumber.from(request.getCellPhoneNumber()),
-                Channel.builder().channelType(ChannelType.valueOf(request.getChannel())).build(),
+                request.getChannelId(),
                 request.getSubscriptionState(), now);
 
         return ResponseEntity.created(URI.create("/api/histories/" + response.getHistoryId()))
@@ -62,16 +60,15 @@ public class SubscriptionController {
     public ResponseEntity<RequestListResponse> getRequestHistories(
             @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
             @RequestParam(value = "date", required = false) LocalDate date,
-            @RequestParam(value = "channel", required = false) String channel) {
-        if (phoneNumber == null && (date == null || channel == null)) {
+            @RequestParam(value = "channel", required = false) Long channelId) {
+        if (phoneNumber == null && (date == null || channelId == null)) {
             throw new RuntimeException("휴대전화번호 혹은 날짜&채널 은 필수 입력입니다.");
         }
         RequestListResponse response;
         if (phoneNumber != null) {
             response = subscriptionService.getRequestsByPhoneNumber(CellPhoneNumber.from(phoneNumber));
         } else {
-            response = subscriptionService.getRequestsByDateAndChannel(date,
-                    Channel.builder().channelType(ChannelType.valueOf(channel)).build());
+            response = subscriptionService.getRequestsByDateAndChannel(date, channelId);
         }
         return ResponseEntity.ok().body(response);
     }

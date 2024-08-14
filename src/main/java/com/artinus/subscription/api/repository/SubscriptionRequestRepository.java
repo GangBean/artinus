@@ -5,10 +5,9 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.artinus.subscription.api.entity.Channel;
-import com.artinus.subscription.api.entity.SubscriptionRequest;
+import com.artinus.subscription.api.entity.SubscriptionHistory;
 
-public interface SubscriptionRequestRepository extends JpaRepository<SubscriptionRequest, Long> {
-    List<SubscriptionRequest> findAllByMemberIdOrderByDateDescTimeDesc(Long memberId);
-    List<SubscriptionRequest> findAllByDateAndChannelOrderByDateDescTimeDescMemberIdAsc(LocalDate date, Channel channel);
+public interface SubscriptionRequestRepository extends JpaRepository<SubscriptionHistory, Long> {
+    List<SubscriptionHistory> findAllByMemberIdOrderByDateDescTimeDesc(Long memberId);
+    List<SubscriptionHistory> findAllByDateAndChannelIdOrderByDateDescTimeDescMemberIdAsc(LocalDate date, Long channelId);
 }

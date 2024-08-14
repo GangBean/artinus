@@ -13,9 +13,10 @@ import com.artinus.subscription.api.exception.ChannelCanNotSubscribeException;
 public class ChannelTest {
     @ParameterizedTest
     @MethodSource("generateSubscribeWhenPossible")
-    void subscribe_when_possible(ChannelType channelType) {
+    void subscribe_when_have_subscribe_auth(String name, ChannelAuthSet auths) {
         Channel channel = Channel.builder()
-                .channelType(channelType)
+                .name(name)
+                .auths(auths)
                 .build();
 
         Assertions.assertThatNoException().isThrownBy(() -> channel.validateSubscription());
@@ -23,31 +24,35 @@ public class ChannelTest {
 
     private static Stream<Arguments> generateSubscribeWhenPossible() {
         return Stream.of(
-                Arguments.of(ChannelType.WEB),
-                Arguments.of(ChannelType.MOBILE));
+                Arguments.of("웹", ChannelAuthSet.of(ChannelAuth.SUBSCRIBE, ChannelAuth.CANCLE)),
+                Arguments.of("모바일", ChannelAuthSet.of(ChannelAuth.SUBSCRIBE)));
     }
 
     @ParameterizedTest
     @MethodSource("generateSubscribeThrowExceptionAndMessageWhenImpossible")
-    void subscribe_throw_Exception_and_messgage_when_impossible(ChannelType channelType) {
-        Channel channel = Channel.builder().channelType(channelType).build();
+    void subscribe_throw_Exception_and_messgage_when_dont_have_subscribe_auth(String name, ChannelAuthSet auths) {
+        Channel channel = Channel.builder()
+                .name(name)
+                .auths(auths)
+                .build();
 
         Assertions.assertThatThrownBy(() -> channel.validateSubscription())
-                .hasMessage("해당 채널은 구독이 불가합니다: " + channelType.toKor())
+                .hasMessage("해당 채널은 구독이 불가합니다: " + channel.getName())
                 .isInstanceOf(ChannelCanNotSubscribeException.class);
     }
 
     private static Stream<Arguments> generateSubscribeThrowExceptionAndMessageWhenImpossible() {
         return Stream.of(
-            Arguments.of(ChannelType.APP)
-        );
+                Arguments.of("웹", ChannelAuthSet.of()),
+                Arguments.of("모바일", ChannelAuthSet.of(ChannelAuth.CANCLE)));
     }
 
     @ParameterizedTest
     @MethodSource("generateCancleWhenPossible")
-    void cancle_when_possible(ChannelType channelType) {
+    void cancle_when_have_cancle_auth(String name, ChannelAuthSet auths) {
         Channel channel = Channel.builder()
-                .channelType(channelType)
+                .name(name)
+                .auths(auths)
                 .build();
 
         Assertions.assertThatNoException().isThrownBy(() -> channel.validateCancle());
@@ -55,24 +60,27 @@ public class ChannelTest {
 
     private static Stream<Arguments> generateCancleWhenPossible() {
         return Stream.of(
-                Arguments.of(ChannelType.WEB),
-                Arguments.of(ChannelType.APP));
+                Arguments.of("웹", ChannelAuthSet.of(ChannelAuth.CANCLE)),
+                Arguments.of("모바일", ChannelAuthSet.of(ChannelAuth.CANCLE, ChannelAuth.SUBSCRIBE)));
     }
 
     @ParameterizedTest
     @MethodSource("generateCancleThrowExceptionAndMessageWhenImpossible")
-    void cancle_throw_Exception_and_messgage_when_impossible(ChannelType channelType) {
-        Channel channel = Channel.builder().channelType(channelType).build();
+    void cancle_throw_Exception_and_messgage_when_dont_have_cancle_auth(String name, ChannelAuthSet auths) {
+        Channel channel = Channel.builder()
+                .name(name)
+                .auths(auths)
+                .build();
 
         Assertions.assertThatThrownBy(() -> channel.validateCancle())
-                .hasMessage("해당 채널은 해지가 불가합니다: " + channelType.toKor())
+                .hasMessage("해당 채널은 해지가 불가합니다: " + channel.getName())
                 .isInstanceOf(ChannelCanNotCancleException.class);
     }
 
     private static Stream<Arguments> generateCancleThrowExceptionAndMessageWhenImpossible() {
         return Stream.of(
-            Arguments.of(ChannelType.MOBILE)
-        );
+                Arguments.of("웹", ChannelAuthSet.of()),
+                Arguments.of("웹", ChannelAuthSet.of(ChannelAuth.SUBSCRIBE)));
     }
 
     // private static Stream<Arguments> generateSubscribeWhenPossible() {

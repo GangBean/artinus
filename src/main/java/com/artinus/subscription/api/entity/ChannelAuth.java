@@ -1,11 +1,11 @@
 package com.artinus.subscription.api.entity;
 
-public enum ChannelType {
-    WEB("웹"), MOBILE("모바일"), APP("앱");
+public enum ChannelAuth {
+    SUBSCRIBE("구독"), CANCLE("취소");
 
     private final String kor;
 
-    private ChannelType(String kor) {
+    private ChannelAuth(String kor) {
         this.kor = kor;
     }
 
