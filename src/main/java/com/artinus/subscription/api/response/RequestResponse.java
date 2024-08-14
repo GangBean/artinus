@@ -3,7 +3,6 @@ package com.artinus.subscription.api.response;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import com.artinus.subscription.api.entity.CellPhoneNumber;
 import com.artinus.subscription.api.entity.Channel;
 import com.artinus.subscription.api.entity.SubscriptionRequest;
 import com.artinus.subscription.api.entity.SubscriptionState;

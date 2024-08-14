@@ -64,7 +64,8 @@ public class SubscriptionService {
     public RequestListResponse getRequestsByPhoneNumber(CellPhoneNumber phoneNumber) {
         Member member = this.memberRepository.findByCellPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new RuntimeException("해당 핸드폰 번호를 갖는 고객 정보가 존재하지 않습니다: " + phoneNumber.toString()));
-        List<SubscriptionRequest> requests = subscriptionRequestRepository.findAllByMemberId(member.getId());
+        List<SubscriptionRequest> requests = subscriptionRequestRepository
+                .findAllByMemberIdOrderByDateDescTimeDesc(member.getId());
         return RequestListResponse.builder()
                 .requests(requests.stream()
                         .map(RequestResponse::from)
@@ -72,7 +73,13 @@ public class SubscriptionService {
                 .build();
     }
 
-    public List<Object> getRequestsByDateAndChannel(LocalDate date, Channel channel) {
-        return new ArrayList<>();
+    public RequestListResponse getRequestsByDateAndChannel(LocalDate date, Channel channel) {
+        List<SubscriptionRequest> requests = subscriptionRequestRepository
+                .findAllByDateAndChannelOrderByDateDescTimeDescMemberIdAsc(date, channel);
+        return RequestListResponse.builder()
+                .requests(requests.stream()
+                        .map(RequestResponse::from)
+                        .toList())
+                .build();
     }
 }
