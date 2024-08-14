@@ -10,11 +10,11 @@ import lombok.Getter;
 public class Channel {
     private ChannelType channelType;
 
-    public void subscribe() {
+    public void validateSubscription() {
         this.channelType.subscribe();
     }
 
-    public void cancle() {
+    public void validateCancle() {
         this.channelType.cancle();
     }
 }

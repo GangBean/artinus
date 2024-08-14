@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.artinus.subscription.api.entity.CellPhoneNumber;
 import com.artinus.subscription.api.entity.Channel;
 import com.artinus.subscription.api.entity.ChannelType;
+import com.artinus.subscription.api.request.CancleRequest;
 import com.artinus.subscription.api.request.SubscriptionRequest;
 import com.artinus.subscription.api.service.SubscriptionService;
 
@@ -35,6 +36,16 @@ public class SubscriptionController {
 
         return ResponseEntity.created(null)
                 .body(null);
+    }
+
+    @PostMapping("/cancle")
+    public ResponseEntity<Void> cancleSubscription(
+            @RequestBody CancleRequest request) {
+        LocalDateTime now = LocalDateTime.now();
+        this.subscriptionService.cancle(CellPhoneNumber.from(request.getCellPhoneNumber()),
+                Channel.builder().channelType(ChannelType.valueOf(request.getChannel())).build(), now);
+
+        return ResponseEntity.created(null).body(null);
     }
 
     @ExceptionHandler(RuntimeException.class)

@@ -18,7 +18,7 @@ public class ChannelTest {
                 .channelType(channelType)
                 .build();
 
-        Assertions.assertThatNoException().isThrownBy(() -> channel.subscribe());
+        Assertions.assertThatNoException().isThrownBy(() -> channel.validateSubscription());
     }
 
     private static Stream<Arguments> generateSubscribeWhenPossible() {
@@ -32,7 +32,7 @@ public class ChannelTest {
     void subscribe_throw_Exception_and_messgage_when_impossible(ChannelType channelType) {
         Channel channel = Channel.builder().channelType(channelType).build();
 
-        Assertions.assertThatThrownBy(() -> channel.subscribe())
+        Assertions.assertThatThrownBy(() -> channel.validateSubscription())
                 .hasMessage("해당 채널은 구독이 불가합니다: " + channelType.toKor())
                 .isInstanceOf(ChannelCanNotSubscribeException.class);
     }
@@ -50,7 +50,7 @@ public class ChannelTest {
                 .channelType(channelType)
                 .build();
 
-        Assertions.assertThatNoException().isThrownBy(() -> channel.cancle());
+        Assertions.assertThatNoException().isThrownBy(() -> channel.validateCancle());
     }
 
     private static Stream<Arguments> generateCancleWhenPossible() {
@@ -64,7 +64,7 @@ public class ChannelTest {
     void cancle_throw_Exception_and_messgage_when_impossible(ChannelType channelType) {
         Channel channel = Channel.builder().channelType(channelType).build();
 
-        Assertions.assertThatThrownBy(() -> channel.cancle())
+        Assertions.assertThatThrownBy(() -> channel.validateCancle())
                 .hasMessage("해당 채널은 해지가 불가합니다: " + channelType.toKor())
                 .isInstanceOf(ChannelCanNotCancleException.class);
     }
