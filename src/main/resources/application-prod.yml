@@ -3,7 +3,7 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:mysql://localhost:3307/artinus
+    url: jdbc:mysql://localhost:3307/artinus?serverTimezone=Asia/Seoul
     username: artinus
     password: artinus
     driver-name: com.mysql.cj.jdbc.Driver
