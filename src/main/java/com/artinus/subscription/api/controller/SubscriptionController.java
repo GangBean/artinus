@@ -1,5 +1,6 @@
 package com.artinus.subscription.api.controller;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -17,7 +18,9 @@ import com.artinus.subscription.api.entity.Channel;
 import com.artinus.subscription.api.entity.ChannelType;
 import com.artinus.subscription.api.request.CancleRequest;
 import com.artinus.subscription.api.request.SubscriptionRequest;
+import com.artinus.subscription.api.response.CancleResponse;
 import com.artinus.subscription.api.response.RequestListResponse;
+import com.artinus.subscription.api.response.SubscribeResponse;
 import com.artinus.subscription.api.service.SubscriptionService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,27 +33,29 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     @PostMapping("/subscriptions")
-    public ResponseEntity<Void> requestSubscription(
+    public ResponseEntity<SubscribeResponse> requestSubscription(
             @RequestBody SubscriptionRequest request) {
         LocalDateTime now = LocalDateTime.now();
 
-        this.subscriptionService.subscribe(CellPhoneNumber.from(request.getCellPhoneNumber()),
+        SubscribeResponse response = this.subscriptionService.subscribe(
+                CellPhoneNumber.from(request.getCellPhoneNumber()),
                 Channel.builder().channelType(ChannelType.valueOf(request.getChannel())).build(),
                 request.getSubscriptionState(), now);
 
-        return ResponseEntity.created(null)
-                .body(null);
+        return ResponseEntity.created(URI.create("/api/histories/" + response.getHistoryId()))
+                .body(response);
     }
 
     @PostMapping("/cancle")
-    public ResponseEntity<Void> cancleSubscription(
+    public ResponseEntity<CancleResponse> cancleSubscription(
             @RequestBody CancleRequest request) {
         LocalDateTime now = LocalDateTime.now();
-        this.subscriptionService.cancle(CellPhoneNumber.from(request.getCellPhoneNumber()),
+        CancleResponse response = this.subscriptionService.cancle(CellPhoneNumber.from(request.getCellPhoneNumber()),
                 Channel.builder().channelType(ChannelType.valueOf(request.getChannel())).build(),
                 request.getSubscriptionState(), now);
 
-        return ResponseEntity.created(null).body(null);
+        return ResponseEntity.created(URI.create("/api/histories/" + response.getHistoryId()))
+                .body(response);
     }
 
     @GetMapping("/histories")

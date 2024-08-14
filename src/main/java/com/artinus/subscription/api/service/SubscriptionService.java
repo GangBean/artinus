@@ -14,8 +14,10 @@ import com.artinus.subscription.api.entity.SubscriptionRequest;
 import com.artinus.subscription.api.entity.SubscriptionState;
 import com.artinus.subscription.api.repository.MemberRepository;
 import com.artinus.subscription.api.repository.SubscriptionRequestRepository;
+import com.artinus.subscription.api.response.CancleResponse;
 import com.artinus.subscription.api.response.RequestListResponse;
 import com.artinus.subscription.api.response.RequestResponse;
+import com.artinus.subscription.api.response.SubscribeResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +28,7 @@ public class SubscriptionService {
     private final SubscriptionRequestRepository subscriptionRequestRepository;
 
     @Transactional
-    public void subscribe(CellPhoneNumber phoneNumber, Channel channel, SubscriptionState state,
+    public SubscribeResponse subscribe(CellPhoneNumber phoneNumber, Channel channel, SubscriptionState state,
             LocalDateTime dateTime) {
         channel.validateSubscription();
         Member member = this.memberRepository.findByCellPhoneNumber(phoneNumber)
@@ -41,11 +43,12 @@ public class SubscriptionService {
                 .build();
 
         this.memberRepository.save(member);
-        this.subscriptionRequestRepository.save(request);
+        SubscriptionRequest saved = this.subscriptionRequestRepository.save(request);
+        return SubscribeResponse.builder().memberId(member.getId()).historyId(saved.getId()).build();
     }
 
     @Transactional
-    public void cancle(CellPhoneNumber phoneNumber, Channel channel, SubscriptionState state, LocalDateTime dateTime) {
+    public CancleResponse cancle(CellPhoneNumber phoneNumber, Channel channel, SubscriptionState state, LocalDateTime dateTime) {
         channel.validateCancle();
         Member member = this.memberRepository.findByCellPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new RuntimeException("해당 핸드폰 번호를 갖는 고객 정보가 존재하지 않습니다: " + phoneNumber.toString()));
@@ -59,7 +62,8 @@ public class SubscriptionService {
                 .build();
 
         this.memberRepository.save(member);
-        this.subscriptionRequestRepository.save(request);
+        SubscriptionRequest saved = this.subscriptionRequestRepository.save(request);
+        return CancleResponse.builder().memberId(member.getId()).historyId(saved.getId()).build();
     }
 
     public RequestListResponse getRequestsByPhoneNumber(CellPhoneNumber phoneNumber) {
