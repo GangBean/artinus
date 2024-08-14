@@ -45,11 +45,11 @@ public class SubscriptionService {
     }
 
     @Transactional
-    public void cancle(CellPhoneNumber phoneNumber, Channel channel, LocalDateTime dateTime) {
+    public void cancle(CellPhoneNumber phoneNumber, Channel channel, SubscriptionState state, LocalDateTime dateTime) {
         channel.validateCancle();
         Member member = this.memberRepository.findByCellPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new RuntimeException("해당 핸드폰 번호를 갖는 고객 정보가 존재하지 않습니다: " + phoneNumber.toString()));
-        member.cancle();
+        member.cancle(state);
         SubscriptionRequest request = SubscriptionRequest.builder()
                 .memberId(member.getId())
                 .channel(channel)

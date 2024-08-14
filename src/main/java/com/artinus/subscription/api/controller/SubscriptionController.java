@@ -47,22 +47,23 @@ public class SubscriptionController {
             @RequestBody CancleRequest request) {
         LocalDateTime now = LocalDateTime.now();
         this.subscriptionService.cancle(CellPhoneNumber.from(request.getCellPhoneNumber()),
-                Channel.builder().channelType(ChannelType.valueOf(request.getChannel())).build(), now);
+                Channel.builder().channelType(ChannelType.valueOf(request.getChannel())).build(),
+                request.getSubscriptionState(), now);
 
         return ResponseEntity.created(null).body(null);
     }
 
     @GetMapping("/histories")
     public ResponseEntity<RequestListResponse> getRequestHistories(
-        @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
-        @RequestParam(value = "date", required = false) LocalDate date,
-        @RequestParam(value = "channel", required = false) String channel
-    ) {
+            @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
+            @RequestParam(value = "date", required = false) LocalDate date,
+            @RequestParam(value = "channel", required = false) String channel) {
         RequestListResponse response;
         if (phoneNumber != null) {
             response = subscriptionService.getRequestsByPhoneNumber(CellPhoneNumber.from(phoneNumber));
         } else {
-            response = subscriptionService.getRequestsByDateAndChannel(date, Channel.builder().channelType(ChannelType.valueOf(channel)).build());
+            response = subscriptionService.getRequestsByDateAndChannel(date,
+                    Channel.builder().channelType(ChannelType.valueOf(channel)).build());
         }
         return ResponseEntity.ok().body(response);
     }
