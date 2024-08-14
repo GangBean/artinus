@@ -76,6 +76,6 @@ public class SubscriptionController {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.internalServerError().body(e.getMessage());
+        return ResponseEntity.internalServerError().body("처리 도중 오류가 발생했습니다. 담당자에게 문의하세요." + e.getMessage());
     }
 }
