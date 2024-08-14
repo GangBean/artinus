@@ -3,7 +3,6 @@ package com.artinus.subscription.api.entity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -23,10 +22,6 @@ public class SubscriptionHistory {
     private LocalDate date;
     private LocalTime time;
     private Long memberId;
-
-    // @Convert(converter = ChannelConverter.class)
-    // private Channel channel;
-
     private Long channelId;
 
     @Enumerated(value = EnumType.STRING)
