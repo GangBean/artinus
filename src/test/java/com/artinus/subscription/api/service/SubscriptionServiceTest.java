@@ -19,7 +19,6 @@ import com.artinus.subscription.api.entity.CellPhoneNumber;
 import com.artinus.subscription.api.entity.Channel;
 import com.artinus.subscription.api.entity.ChannelAuth;
 import com.artinus.subscription.api.entity.ChannelAuthSet;
-import com.artinus.subscription.api.entity.ChannelType;
 import com.artinus.subscription.api.entity.Member;
 import com.artinus.subscription.api.entity.SubscriptionHistory;
 import com.artinus.subscription.api.entity.SubscriptionState;
@@ -190,11 +189,6 @@ public class SubscriptionServiceTest {
                                 .build();
                 memberRepository.saveAll(List.of(member, member2));
 
-                // List<Channel> channels = List.of(
-                // Channel.builder().channelType(ChannelType.WEB).build(),
-                // Channel.builder().channelType(ChannelType.MOBILE).build(),
-                // Channel.builder().channelType(ChannelType.APP).build());
-
                 Channel channel = channelRepository.save(Channel.builder()
                                 .name("웹")
                                 .auths(ChannelAuthSet.of(ChannelAuth.SUBSCRIBE, ChannelAuth.CANCLE))
@@ -250,11 +244,5 @@ public class SubscriptionServiceTest {
                 Assertions.assertThat(requests.get(2).getChannelId()).isEqualTo(channel.getId());
                 Assertions.assertThat(requests.get(2).getDate()).isEqualTo(dateTimes.get(0).toLocalDate());
                 Assertions.assertThat(requests.get(2).getTime()).isEqualTo(dateTimes.get(0).toLocalTime());
-
-                // Assertions.assertThat(requests.get(3).getMemberId()).isEqualTo(member2.getId());
-                // Assertions.assertThat(requests.get(3).getSubscriptionState()).isEqualTo(SubscriptionState.NORMAL);
-                // Assertions.assertThat(requests.get(3).getChannel()).isEqualTo(channels.get(1));
-                // Assertions.assertThat(requests.get(3).getDate()).isEqualTo(dateTimes.get(0).toLocalDate());
-                // Assertions.assertThat(requests.get(3).getTime()).isEqualTo(dateTimes.get(0).toLocalTime().plusHours(2));
         }
 }
