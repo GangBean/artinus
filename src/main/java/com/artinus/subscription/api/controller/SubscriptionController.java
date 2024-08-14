@@ -58,6 +58,9 @@ public class SubscriptionController {
             @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
             @RequestParam(value = "date", required = false) LocalDate date,
             @RequestParam(value = "channel", required = false) String channel) {
+        if (phoneNumber == null && (date == null || channel == null)) {
+            throw new RuntimeException("휴대전화번호 혹은 날짜&채널 은 필수 입력입니다.");
+        }
         RequestListResponse response;
         if (phoneNumber != null) {
             response = subscriptionService.getRequestsByPhoneNumber(CellPhoneNumber.from(phoneNumber));
