@@ -3,3 +3,6 @@ spring:
     name: api
   profiles:
     active: prod
+  redis:
+    host: localhost
+    port: 6380
