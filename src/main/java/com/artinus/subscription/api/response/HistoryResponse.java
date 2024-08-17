@@ -1,8 +1,5 @@
 package com.artinus.subscription.api.response;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 import com.artinus.subscription.api.entity.SubscriptionHistory;
 import com.artinus.subscription.api.entity.SubscriptionState;
 

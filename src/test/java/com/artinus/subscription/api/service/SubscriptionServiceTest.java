@@ -11,25 +11,21 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.artinus.subscription.api.config.RedisConfig;
@@ -60,24 +56,10 @@ public class SubscriptionServiceTest {
         @Autowired
         private PlatformTransactionManager transactionManager;
         @Autowired
-        private RedissonClient redissonClient;
-
-        @Value("${spring.redis.wait_time}")
-        private int waitTime;
-
-        @Value("${spring.redis.lease_time}")
-        private int leaseTime;
-
-        // @Autowired
         private SubscriptionService service;
 
-        @Autowired
-        private ApplicationContext context;
-        
         @BeforeEach
         void setup() {
-                service = new SubscriptionService(memberRepository, historyRepository, channelRepository,
-                redissonClient);
                 clean();
         }
 
@@ -291,7 +273,8 @@ public class SubscriptionServiceTest {
                 Assertions.assertThat(requests.get(0).getAfterState()).isEqualTo(SubscriptionState.NONE);
                 Assertions.assertThat(requests.get(0).getChannelId()).isEqualTo(channel.getId());
                 Assertions.assertThat(requests.get(0).getDate()).isEqualTo(dateTimes.get(0).toLocalDate().toString());
-                Assertions.assertThat(requests.get(0).getTime()).isEqualTo(dateTimes.get(0).toLocalTime().plusHours(2).toString());
+                Assertions.assertThat(requests.get(0).getTime())
+                                .isEqualTo(dateTimes.get(0).toLocalTime().plusHours(2).toString());
 
                 Assertions.assertThat(requests.get(1).getMemberId()).isEqualTo(member.getId());
                 Assertions.assertThat(requests.get(1).getBeforeState()).isEqualTo(SubscriptionState.NONE);
@@ -308,8 +291,6 @@ public class SubscriptionServiceTest {
                 Assertions.assertThat(requests.get(2).getTime()).isEqualTo(dateTimes.get(0).toLocalTime().toString());
         }
 
-        // @ParameterizedTest
-        // @ValueSource(ints = { 1_000, 5_000, 7_000, 10_000 })
         @Test
         void multi_threads_insert_consecutive_histories() throws InterruptedException, ExecutionException {
                 // given
@@ -333,45 +314,7 @@ public class SubscriptionServiceTest {
 
                 int threadCount = 10_000;
                 int executeCount = 1;
-                // IntStream.range(0, threadCount)
-                // .mapToObj(i -> (Runnable) this.task(i, executeCount, channelId))
-                // .map(executor::submit)
-                // .forEach(future -> {
-                // try {
-                // future.get();
-                // } catch (Exception e) {
-                // e.printStackTrace();
-                // }
-                // });
                 IntStream.range(0, threadCount)
-                                // .mapToObj(i -> (Runnable) () -> {
-                                // Member member = memberRepository.findAll().get(0);
-                                // for (int j = 0; j < executeCount; j++) {
-                                // TransactionStatus threadStatus = transactionManager
-                                // .getTransaction(new DefaultTransactionDefinition());
-                                // try {
-                                // int idx = (int) (Math.random() * 3);
-                                // SubscriptionState state = SubscriptionState.values()[idx];
-                                // if (i % 2 == 0) {
-                                // this.service.subscribe(
-                                // member.getCellPhoneNumber(),
-                                // channelId,
-                                // state,
-                                // LocalDateTime.now());
-                                // } else {
-                                // this.service.cancle(
-                                // member.getCellPhoneNumber(),
-                                // channelId,
-                                // state,
-                                // LocalDateTime.now());
-                                // }
-                                // transactionManager.commit(threadStatus);
-                                // } catch (ApplicationException e) {
-                                // transactionManager.rollback(threadStatus);
-                                // continue;
-                                // }
-                                // }
-                                // })
                                 .mapToObj(i -> task(i, executeCount, channelId))
                                 .map(executor::submit)
                                 .forEach(future -> {

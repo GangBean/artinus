@@ -8,8 +8,13 @@ spring:
     password: artinus
     driver-name: com.mysql.cj.jdbc.Driver
   jpa:
+    show-sql: true
     hibernate:
       ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+logging:
+  level.org.hibernate:
+    SQL: DEBUG
+    orm.jdbc.bind: TRACE
