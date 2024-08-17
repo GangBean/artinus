@@ -4,11 +4,12 @@ import java.util.StringJoiner;
 
 import com.artinus.subscription.api.exception.CellPhoneNumberNotValidException;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-@Builder @Getter
+@Builder(access = AccessLevel.PRIVATE) @Getter
 @EqualsAndHashCode
 public class CellPhoneNumber {
     private final String front;

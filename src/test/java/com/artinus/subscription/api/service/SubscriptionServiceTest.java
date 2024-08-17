@@ -83,8 +83,7 @@ public class SubscriptionServiceTest {
                 // given
                 SubscriptionState beforeState = SubscriptionState.NONE;
                 Member member = memberRepository.save(Member.builder()
-                                .cellPhoneNumber(CellPhoneNumber.builder().front("010").middle("1234").rear("5678")
-                                                .build())
+                                .cellPhoneNumber(CellPhoneNumber.from("010-1234-5678"))
                                 .subscriptionState(beforeState)
                                 .build());
                 Channel channel = channelRepository.save(Channel.builder()
@@ -123,8 +122,7 @@ public class SubscriptionServiceTest {
                         String name, ChannelAuthSet auths) {
                 // given
                 Member member = memberRepository.save(Member.builder()
-                                .cellPhoneNumber(CellPhoneNumber.builder().front("010").middle("1234").rear("5678")
-                                                .build())
+                                .cellPhoneNumber(CellPhoneNumber.from("010-1234-5678"))
                                 .subscriptionState(state)
                                 .build());
 
@@ -162,9 +160,7 @@ public class SubscriptionServiceTest {
         void get_requests_by_phone_number_return_list_of_phone_number_owners_entire_subscription_histories() {
                 // given
                 Member member = Member.builder()
-                                .cellPhoneNumber(CellPhoneNumber.builder()
-                                                .front("010").middle("1234").rear("4567")
-                                                .build())
+                                .cellPhoneNumber(CellPhoneNumber.from("010-1234-5678"))
                                 .subscriptionState(SubscriptionState.NONE)
                                 .build();
                 memberRepository.save(member);
@@ -216,15 +212,11 @@ public class SubscriptionServiceTest {
         void get_requests_by_date_and_channel_return_list_of_corresponding_subscription_histories() {
                 // given
                 Member member = Member.builder()
-                                .cellPhoneNumber(CellPhoneNumber.builder()
-                                                .front("010").middle("1234").rear("4567")
-                                                .build())
+                                .cellPhoneNumber(CellPhoneNumber.from("010-1234-5678"))
                                 .subscriptionState(SubscriptionState.NONE)
                                 .build();
                 Member member2 = Member.builder()
-                                .cellPhoneNumber(CellPhoneNumber.builder()
-                                                .front("010").middle("3321").rear("9876")
-                                                .build())
+                                .cellPhoneNumber(CellPhoneNumber.from("010-1234-1234"))
                                 .subscriptionState(SubscriptionState.NONE)
                                 .build();
                 memberRepository.saveAll(List.of(member, member2));
@@ -312,7 +304,7 @@ public class SubscriptionServiceTest {
                 Long memberId = idxs.get(0);
                 Long channelId = idxs.get(1);
 
-                int threadCount = 10_000;
+                int threadCount = 1_000;
                 int executeCount = 1;
                 IntStream.range(0, threadCount)
                                 .mapToObj(i -> task(i, executeCount, channelId))

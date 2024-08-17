@@ -2,11 +2,12 @@ package com.artinus.subscription.api.entity;
 
 import java.util.Set;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-@Builder @Getter
+@Builder(access = AccessLevel.PRIVATE) @Getter
 @EqualsAndHashCode
 public class ChannelAuthSet {
     private Set<ChannelAuth> auths;
