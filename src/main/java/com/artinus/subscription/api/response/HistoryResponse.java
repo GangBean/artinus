@@ -18,8 +18,8 @@ public class HistoryResponse {
     private final Long channelId;
     private final SubscriptionState beforeState;
     private final SubscriptionState afterState;
-    private final LocalDate date;
-    private final LocalTime time;
+    private final String date;
+    private final String time;
 
     public static HistoryResponse from(SubscriptionHistory history) {
         return HistoryResponse.builder()

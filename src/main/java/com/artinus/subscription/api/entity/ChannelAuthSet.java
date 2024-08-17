@@ -3,9 +3,11 @@ package com.artinus.subscription.api.entity;
 import java.util.Set;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Builder @Getter
+@EqualsAndHashCode
 public class ChannelAuthSet {
     private Set<ChannelAuth> auths;
 

@@ -5,10 +5,11 @@ import java.util.StringJoiner;
 import com.artinus.subscription.api.exception.CellPhoneNumberNotValidException;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-@Builder
-@Getter
+@Builder @Getter
+@EqualsAndHashCode
 public class CellPhoneNumber {
     private final String front;
     private final String middle;
