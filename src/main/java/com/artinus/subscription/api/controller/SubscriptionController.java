@@ -25,6 +25,9 @@ import com.artinus.subscription.api.response.HistoryListResponse;
 import com.artinus.subscription.api.response.SubscribeResponse;
 import com.artinus.subscription.api.service.SubscriptionService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -35,6 +38,12 @@ public class SubscriptionController {
     private static final Pattern DATE_WITHOUT_DASH = Pattern.compile("\\d{8}");
     private final SubscriptionService subscriptionService;
 
+    @Operation(summary = "구독 요청", description = "사용자의 구독 요청을 처리합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "구독 요청 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+        @ApiResponse(responseCode = "500", description = "서버 내부 오류: 담당자 확인 요청"),
+    })
     @PostMapping("/subscriptions")
     public ResponseEntity<SubscribeResponse> requestSubscription(
             @RequestBody final SubscriptionRequest request) {
@@ -49,6 +58,12 @@ public class SubscriptionController {
                 .body(response);
     }
 
+    @Operation(summary = "구독 취소 요청", description = "사용자의 구독 취소 요청을 처리합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "구독 취소 요청 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+        @ApiResponse(responseCode = "500", description = "서버 내부 오류: 담당자 확인 요청"),
+    })
     @PostMapping("/cancellations")
     public ResponseEntity<CancelResponse> cancelSubscription(
             @RequestBody final CancelRequest request) {
@@ -61,6 +76,12 @@ public class SubscriptionController {
                 .body(response);
     }
 
+    @Operation(summary = "구독 요청 이력 조회", description = "휴대전화 번호, 날짜 또는 채널 ID에 따라 구독 요청 이력을 조회합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "이력 조회 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+        @ApiResponse(responseCode = "500", description = "서버 내부 오류: 담당자 확인 요청"),
+    })
     @GetMapping("/histories")
     public ResponseEntity<HistoryListResponse> getRequestHistories(
             @RequestParam(value = "phoneNumber", required = false) final String phoneNumber,
@@ -96,6 +117,11 @@ public class SubscriptionController {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.internalServerError().body("처리 도중 오류가 발생했습니다. 담당자에게 문의하세요. : " + e.getMessage());
+        return ResponseEntity.internalServerError().body("처리 도중 오류가 발생했습니다. 담당자에게 문의하세요.");
+    }
+
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity<String> handleApplicationException(ApplicationException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
