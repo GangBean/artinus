@@ -294,6 +294,11 @@ select * from channel;
 +----+------------------+--------+
 ```
 ## 2. 구독 API
+```
+curl -X POST http://localhost:8081/api/subscriptions \
+     -H "Content-Type: application/json" \
+     -d '{"cellPhoneNumber": "010-1111-1111", "channelId": 1, "subscriptionState": "PREMIUM"}'
+```
 - **Endpoint**: `/api/subscriptions`
 - **Method**: `POST`
 - **Request Body**: `SubscriptionRequest`
@@ -304,6 +309,11 @@ select * from channel;
     "subscriptionState": "string"
   }
 ## 3. 해지 API
+```
+curl -X POST http://localhost:8081/api/cancellations \
+     -H "Content-Type: application/json" \
+     -d '{"cellPhoneNumber": "010-1111-1111", "channelId": 1, "subscriptionState": "NONE"}'
+```
 - **Endpoint**: `/api/cancle`
 - **Method**: `POST`
 - **Request Body**: `CancleRequest`
@@ -314,6 +324,9 @@ select * from channel;
     "subscriptionState": "string"
   }
 ## 4. 회원 이력 조회 API
+```
+curl -X GET 'http://localhost:8081/api/histories?phoneNumber=010-1111-1111'
+```
 - **Endpoint**: `/api/histories`
 - **Method**: `GET`
 - **Request Parameters**:
@@ -333,6 +346,10 @@ select * from channel;
     }]
   }
 ## 5. 채널 이력 조회 API
+```
+curl -X GET 'http://localhost:8081/api/histories?date=2024-08-17&channel=1'
+curl -X GET 'http://localhost:8081/api/histories?date=20240817&channel=1'
+```
 - **Endpoint**: `/api/histories`
 - **Method**: `GET`
 - **Request Parameters**:
