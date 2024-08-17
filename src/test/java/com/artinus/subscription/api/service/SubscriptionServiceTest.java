@@ -41,7 +41,7 @@ import com.artinus.subscription.api.response.HistoryResponse;
 
 @DataJpaTest
 @ActiveProfiles("test")
-@Import({ RedisConfig.class, SubscriptionService.class })
+@Import({ RedisConfig.class, SubscriptionService.class, RedisTestContainers.class })
 public class SubscriptionServiceTest {
 
         @Autowired
