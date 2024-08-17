@@ -3,6 +3,8 @@ package com.artinus.subscription.api.controller;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.StringJoiner;
+import java.util.regex.Pattern;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,10 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.artinus.subscription.api.entity.CellPhoneNumber;
+import com.artinus.subscription.api.exception.ApplicationException;
 import com.artinus.subscription.api.exception.SubscriptionControllerException;
-import com.artinus.subscription.api.request.CancleRequest;
+import com.artinus.subscription.api.request.CancelRequest;
 import com.artinus.subscription.api.request.SubscriptionRequest;
-import com.artinus.subscription.api.response.CancleResponse;
+import com.artinus.subscription.api.response.CancelResponse;
 import com.artinus.subscription.api.response.HistoryListResponse;
 import com.artinus.subscription.api.response.SubscribeResponse;
 import com.artinus.subscription.api.service.SubscriptionService;
@@ -28,12 +31,13 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api")
 public class SubscriptionController {
-
+    private static final Pattern DATE_WITH_DASH = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+    private static final Pattern DATE_WITHOUT_DASH = Pattern.compile("\\d{8}");
     private final SubscriptionService subscriptionService;
 
     @PostMapping("/subscriptions")
     public ResponseEntity<SubscribeResponse> requestSubscription(
-            @RequestBody SubscriptionRequest request) {
+            @RequestBody final SubscriptionRequest request) {
         LocalDateTime now = LocalDateTime.now();
 
         SubscribeResponse response = this.subscriptionService.subscribe(
@@ -45,11 +49,11 @@ public class SubscriptionController {
                 .body(response);
     }
 
-    @PostMapping("/cancle")
-    public ResponseEntity<CancleResponse> cancleSubscription(
-            @RequestBody CancleRequest request) {
+    @PostMapping("/cancellations")
+    public ResponseEntity<CancelResponse> cancelSubscription(
+            @RequestBody final CancelRequest request) {
         LocalDateTime now = LocalDateTime.now();
-        CancleResponse response = this.subscriptionService.cancle(CellPhoneNumber.from(request.getCellPhoneNumber()),
+        CancelResponse response = this.subscriptionService.cancel(CellPhoneNumber.from(request.getCellPhoneNumber()),
                 request.getChannelId(),
                 request.getSubscriptionState(), now);
 
@@ -59,23 +63,39 @@ public class SubscriptionController {
 
     @GetMapping("/histories")
     public ResponseEntity<HistoryListResponse> getRequestHistories(
-            @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
-            @RequestParam(value = "date", required = false) LocalDate date,
-            @RequestParam(value = "channel", required = false) Long channelId) {
-        if (phoneNumber == null && (date == null || channelId == null)) {
+            @RequestParam(value = "phoneNumber", required = false) final String phoneNumber,
+            @RequestParam(value = "date", required = false) final String dateString,
+            @RequestParam(value = "channel", required = false) final Long channelId) {
+        if ((phoneNumber == null || phoneNumber.isBlank())
+                && ((dateString == null || dateString.isBlank()) || channelId == null)) {
             throw new SubscriptionControllerException("휴대전화번호 혹은 날짜&채널 은 필수 입력입니다.");
         }
         HistoryListResponse response;
         if (phoneNumber != null) {
             response = subscriptionService.getRequestsByPhoneNumber(CellPhoneNumber.from(phoneNumber));
         } else {
+            LocalDate date = parsed(dateString);
             response = subscriptionService.getRequestsByDateAndChannel(date, channelId);
         }
         return ResponseEntity.ok().body(response);
     }
 
+    private LocalDate parsed(final String dateString) {
+        if (DATE_WITH_DASH.matcher(dateString).matches()) {
+            return LocalDate.parse(dateString);
+        }
+        if (DATE_WITHOUT_DASH.matcher(dateString).matches()) {
+            return LocalDate.parse(new StringJoiner("-")
+                    .add(dateString.substring(0, 4))
+                    .add(dateString.substring(4, 6))
+                    .add(dateString.substring(6, 8))
+                    .toString());
+        }
+        throw new ApplicationException("날짜 형식을 확인해주세요(yyyy-mm-dd): " + dateString);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.internalServerError().body("처리 도중 오류가 발생했습니다. 담당자에게 문의하세요." + e.getMessage());
+        return ResponseEntity.internalServerError().body("처리 도중 오류가 발생했습니다. 담당자에게 문의하세요. : " + e.getMessage());
     }
 }

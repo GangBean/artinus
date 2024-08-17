@@ -9,7 +9,7 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 @Getter
-public class CancleRequest {
+public class CancelRequest {
     private String cellPhoneNumber;
     private Long channelId;
     private SubscriptionState subscriptionState;

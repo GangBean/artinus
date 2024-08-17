@@ -22,7 +22,7 @@ import com.artinus.subscription.api.exception.MemberNotExistsException;
 import com.artinus.subscription.api.repository.ChannelRepository;
 import com.artinus.subscription.api.repository.MemberRepository;
 import com.artinus.subscription.api.repository.SubscriptionHistoryRepository;
-import com.artinus.subscription.api.response.CancleResponse;
+import com.artinus.subscription.api.response.CancelResponse;
 import com.artinus.subscription.api.response.HistoryListResponse;
 import com.artinus.subscription.api.response.HistoryResponse;
 import com.artinus.subscription.api.response.SubscribeResponse;
@@ -64,7 +64,7 @@ public class SubscriptionService {
                 }
         }
 
-        public CancleResponse cancle(
+        public CancelResponse cancel(
                         CellPhoneNumber phoneNumber,
                         Long channelId,
                         SubscriptionState state,
@@ -77,7 +77,7 @@ public class SubscriptionService {
                         if (!rLock.tryLock(waitTime, leaseTime, TimeUnit.SECONDS)) {
                                 throw new ApplicationException("Lock 획득에 실패했습니다. 잠시 후 다시 시도해주세요.");
                         }
-                        return cancle(phoneNumber, state, channel, dateTime);
+                        return cancel(phoneNumber, state, channel, dateTime);
                 } catch (InterruptedException e) {
                         throw new ApplicationException();
                 } finally {
@@ -113,7 +113,7 @@ public class SubscriptionService {
         }
 
         @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-        private CancleResponse cancle(CellPhoneNumber phoneNumber, SubscriptionState state, Channel channel,
+        private CancelResponse cancel(CellPhoneNumber phoneNumber, SubscriptionState state, Channel channel,
                         LocalDateTime dateTime) {
                 Member member = findMemberByCellPhoneNumberOrThrowsException(phoneNumber);
                 SubscriptionState beforeState = member.getSubscriptionState();
@@ -132,7 +132,7 @@ public class SubscriptionService {
 
                 this.memberRepository.save(member);
                 SubscriptionHistory saved = this.subscriptionRequestRepository.save(history);
-                return CancleResponse.builder()
+                return CancelResponse.builder()
                                 .memberId(member.getId())
                                 .historyId(saved.getId())
                                 .build();

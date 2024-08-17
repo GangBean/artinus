@@ -3,6 +3,7 @@ package com.artinus.subscription.api.entity;
 import com.artinus.subscription.api.config.CellPhoneNumberConverter;
 import com.artinus.subscription.api.exception.SubscriptionStateCanNotChangeException;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -22,6 +23,7 @@ public class Member {
     private Long id;
     
     @Convert(converter = CellPhoneNumberConverter.class)
+    @Column(unique = true)
     private CellPhoneNumber cellPhoneNumber;
     
     @Enumerated(value = EnumType.STRING)

@@ -134,7 +134,7 @@ public class SubscriptionServiceTest {
                 LocalDateTime now = LocalDateTime.of(2024, 8, 31, 12, 0, 0);
 
                 // when
-                service.cancle(member.getCellPhoneNumber(), channel.getId(), SubscriptionState.NONE, now);
+                service.cancel(member.getCellPhoneNumber(), channel.getId(), SubscriptionState.NONE, now);
 
                 Member foundMember = memberRepository.findById(member.getId()).orElseThrow();
                 SubscriptionHistory history = historyRepository.findAll().get(0);
@@ -176,7 +176,7 @@ public class SubscriptionServiceTest {
                 dateTimes.add(now);
 
                 now = now.plusDays(1);
-                service.cancle(member.getCellPhoneNumber(), channel.getId(), SubscriptionState.NONE, now);
+                service.cancel(member.getCellPhoneNumber(), channel.getId(), SubscriptionState.NONE, now);
                 dateTimes.add(now);
 
                 now = now.plusDays(1);
@@ -235,23 +235,23 @@ public class SubscriptionServiceTest {
                 LocalDateTime now = LocalDateTime.now();
                 service.subscribe(member.getCellPhoneNumber(), channel.getId(), SubscriptionState.NORMAL, now);
                 service.subscribe(member2.getCellPhoneNumber(), channel.getId(), SubscriptionState.NORMAL, now);
-                service.cancle(member.getCellPhoneNumber(), channel.getId(), SubscriptionState.NONE, now.plusHours(2));
-                service.cancle(member2.getCellPhoneNumber(), channel2.getId(), SubscriptionState.NONE,
+                service.cancel(member.getCellPhoneNumber(), channel.getId(), SubscriptionState.NONE, now.plusHours(2));
+                service.cancel(member2.getCellPhoneNumber(), channel2.getId(), SubscriptionState.NONE,
                                 now.plusHours(2));
                 dateTimes.add(now);
 
                 now = now.plusDays(1);
                 service.subscribe(member.getCellPhoneNumber(), channel.getId(), SubscriptionState.PREMIUM, now);
                 service.subscribe(member2.getCellPhoneNumber(), channel.getId(), SubscriptionState.PREMIUM, now);
-                service.cancle(member.getCellPhoneNumber(), channel2.getId(), SubscriptionState.NONE, now);
-                service.cancle(member2.getCellPhoneNumber(), channel2.getId(), SubscriptionState.NONE, now);
+                service.cancel(member.getCellPhoneNumber(), channel2.getId(), SubscriptionState.NONE, now);
+                service.cancel(member2.getCellPhoneNumber(), channel2.getId(), SubscriptionState.NONE, now);
                 dateTimes.add(now);
 
                 now = now.plusDays(1);
                 service.subscribe(member.getCellPhoneNumber(), channel2.getId(), SubscriptionState.PREMIUM, now);
                 service.subscribe(member2.getCellPhoneNumber(), channel2.getId(), SubscriptionState.PREMIUM, now);
-                service.cancle(member.getCellPhoneNumber(), channel.getId(), SubscriptionState.NONE, now);
-                service.cancle(member2.getCellPhoneNumber(), channel.getId(), SubscriptionState.NONE, now);
+                service.cancel(member.getCellPhoneNumber(), channel.getId(), SubscriptionState.NONE, now);
+                service.cancel(member2.getCellPhoneNumber(), channel.getId(), SubscriptionState.NONE, now);
                 dateTimes.add(now);
 
                 // when
@@ -349,7 +349,7 @@ public class SubscriptionServiceTest {
                                                                 state,
                                                                 LocalDateTime.now());
                                         } else {
-                                                this.service.cancle(
+                                                this.service.cancel(
                                                                 member.getCellPhoneNumber(),
                                                                 channelId,
                                                                 state,
