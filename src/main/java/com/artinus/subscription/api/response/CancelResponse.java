@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Builder @AllArgsConstructor @Getter
-public class CancleResponse {
+public class CancelResponse {
     private final Long memberId;
     private final Long historyId;
 }

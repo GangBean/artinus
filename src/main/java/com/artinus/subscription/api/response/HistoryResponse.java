@@ -1,8 +1,5 @@
 package com.artinus.subscription.api.response;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 import com.artinus.subscription.api.entity.SubscriptionHistory;
 import com.artinus.subscription.api.entity.SubscriptionState;
 
@@ -18,8 +15,8 @@ public class HistoryResponse {
     private final Long channelId;
     private final SubscriptionState beforeState;
     private final SubscriptionState afterState;
-    private final LocalDate date;
-    private final LocalTime time;
+    private final String date;
+    private final String time;
 
     public static HistoryResponse from(SubscriptionHistory history) {
         return HistoryResponse.builder()

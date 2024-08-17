@@ -3,3 +3,8 @@ spring:
     name: api
   profiles:
     active: prod
+  redis:
+    host: localhost
+    port: 6380
+    wait_time: 15
+    lease_time: 10

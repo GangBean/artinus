@@ -23,10 +23,9 @@ public class ChannelAuthSetConverter implements AttributeConverter<ChannelAuthSe
 
     @Override
     public ChannelAuthSet convertToEntityAttribute(String dbData) {
-        return dbData != null && !dbData.isBlank() ? ChannelAuthSet.builder()
-                .auths(Arrays.stream(dbData.split(DELIMITER))
+        return dbData != null && !dbData.isBlank() ? ChannelAuthSet.of(
+                Arrays.stream(dbData.split(DELIMITER))
                         .map(ChannelAuth::valueOf)
-                        .collect(Collectors.toSet()))
-                .build() : null;
+                        .toArray(ChannelAuth[]::new)) : null;
     }
 }

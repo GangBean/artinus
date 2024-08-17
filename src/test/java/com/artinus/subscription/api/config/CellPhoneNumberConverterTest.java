@@ -10,12 +10,9 @@ public class CellPhoneNumberConverterTest {
     @Test
     void convertTest() {
         CellPhoneNumberConverter converter = new CellPhoneNumberConverter();
-        CellPhoneNumber cellPhoneNumber = CellPhoneNumber.builder()
-                .front("010")
-                .middle("1234")
-                .rear("4567")
-                .build();
+        String number = "010-1234-4567";
+        CellPhoneNumber cellPhoneNumber = CellPhoneNumber.from(number);
 
-        Assertions.assertThat(converter.convertToDatabaseColumn(cellPhoneNumber)).isEqualTo("010-1234-4567");
+        Assertions.assertThat(converter.convertToDatabaseColumn(cellPhoneNumber)).isEqualTo(number);
     }
 }
