@@ -271,8 +271,10 @@ mysql> select * from subscription_history;
 - 애플리케이션 레벨에서 반올림이 일어나는 것으로 추측되지만, 데이터 변경이 일어나는 부분을 찾지 못했고, 운영 환경에서 사용할 DB인 mysql에서 nano초를 지원하지 않기때문에, 입력값 형태를 그대로 데이터베이스에 적재할 수 있는 방법을 고민했고, 시간값을 문자열로 저장하는 방식으로 문제를 해결했습니다.
 
 # API 명세
+## 0. Swagger UI
+- http://localhost:8081/swagger-ui.html 에서 API의 명세를 확인하고, 테스트 하실 수 있습니다.
 ## 1. 테스트 데이터
-- 기본적으로 아래 테이블에 해당하는 데이터를 적재하도록 ApplicationRunner Bean을 생성해두었습니다.
+- 기본적으로 아래 테이블에 해당하는 데이터를 적재하도록 `ApplicationRunner` Bean을 생성해두었습니다.
 ```
 select * from member;
 +----+-------------------+--------------------+
