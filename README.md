@@ -15,8 +15,8 @@ Docker Compose version v2.21.0-desktop.1
 # 애플리케이션 실행
 - App 과 DB는 컨테이너로 Docker compose를 통해 로컬에서 실행되도록 구성되어있습니다.
 - 프로젝트 root 디렉토리에서 deploy.sh 을 수행하면, App image를 빌드하고, docker compose로 컨테이너가 기동됩니다.
-  - App container port: 8081 / MySQL container port: 3307 / Redis container port: 6380
-  - App container name: artinus / MySQL container name: artinus-db / Redis container name: artinus-redis
+  - App container port: `8081` / MySQL container port: `3307` / Redis container port: `6380`
+  - App container name: `artinus` / MySQL container name: `artinus-db` / Redis container name: `artinus-redis`
 ```
 cd ${ROOT_DIR}
 sh ./deploy.sh
